@@ -4,25 +4,41 @@ import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 import logging
 
-import numpy as np
 
-import openslide
+import SimpleITK as sitk
+import sys
+import numpy
 
-from skimage.transform import resize
+import math
+
 
 import os.path
 from os.path import expanduser
 homeDir = expanduser("~")
 
-import h5py
+
+try:
+    import openslide
+except ImportError:
+    slicer.util.pip_install("openslide-python")
+
+try:
+    import skimage.transform
+except ImportError:
+    slicer.util.pip_install("scilearn-image")
 
 
-import SimpleITK as sitk
-import sys
-import numpy
-import os
-import keras.models
-import math
+try:
+    import h5py
+except ImportError:
+    slicer.util.pip_install("h5py")
+
+try:
+    import keras.models
+except ImportError:
+    slicer.util.pip_install("keras")
+
+
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -624,7 +640,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     if thisTilePilIm.mode != "RGB":
         thisTilePilIm = thisTilePilIm.convert("RGB")
 
-    imRGBNdarray = np.asarray(thisTilePilIm)
+    imRGBNdarray = numpy.asarray(thisTilePilIm)
 
     slide.close()
 
@@ -667,7 +683,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
 
     # print(q.max())
 
-    p = resize(q, (int(self.patchSizeY), int(self.patchSizeX)), preserve_range=True, mode='wrap', order=0, anti_aliasing=False)
+    p = skimage.transform.resize(q, (int(self.patchSizeY), int(self.patchSizeX)), preserve_range=True, mode='wrap', order=0, anti_aliasing=False)
     #print("RGB Got size = ", q.shape, "resize to ", p.shape, q.shape[0]/p.shape[0], q.shape[1]/p.shape[1])
     # print(p.max())
 
@@ -717,12 +733,12 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
       # size. If not padded first, the subsequent resize will stretch
       # the label image
       if labelArrayInLevel.shape != (size0, size1):
-        tmp = np.zeros((size0, size1))
+        tmp = numpy.zeros((size0, size1))
         tmp[:labelArrayInLevel.shape[0], :labelArrayInLevel.shape[1]] = labelArrayInLevel
         labelArrayInLevel = tmp
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      labelArray = resize(labelArrayInLevel, (int(self.patchSizeY), int(self.patchSizeX)), preserve_range=True, mode='wrap', order=0, anti_aliasing=False)
+      labelArray = skimage.transform.resize(labelArrayInLevel, (int(self.patchSizeY), int(self.patchSizeX)), preserve_range=True, mode='wrap', order=0, anti_aliasing=False)
       #print("got size = ", labelArrayInLevel.shape, "resize to = ", labelArray.shape, "ratio = ", labelArrayInLevel.shape[0]/labelArray.shape[0], labelArrayInLevel.shape[1]/labelArray.shape[1])
       #print("max label labelArray = " + str(labelArray.max()))
 
@@ -731,7 +747,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
       # print(self.topLeftXSliderWidget.value, self.topLeftXSliderWidget.value, self.patchSizeX, self.patchSizeY)
       # print(labelArray.max())
 
-      # labelArray = np.zeros((self.patchSizeY, self.patchSizeX), dtype='uint8')
+      # labelArray = numpy.zeros((self.patchSizeY, self.patchSizeX), dtype='uint8')
       # labelArray[int(self.patchSizeY/3):int(2*self.patchSizeY/3), int(self.patchSizeX/3):int(2*self.patchSizeX/3)] = 1
 
       n = slicer.util.getNode('currentPatchFromH5File-label')
