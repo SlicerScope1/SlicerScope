@@ -1,4 +1,5 @@
 set(modules
+BigViewerModule
   CropVolumeSequence
   DataProbe
   Editor
