@@ -25,13 +25,19 @@ except ImportError:
 try:
     import skimage.transform
 except ImportError:
-    slicer.util.pip_install("scilearn-image")
+    slicer.util.pip_install("scikit-image")
 
 
 try:
     import h5py
 except ImportError:
     slicer.util.pip_install("h5py")
+
+try:
+    import tensorflow
+except ImportError:
+    slicer.util.pip_install("tensorflow")
+    
 
 try:
     import keras.models
