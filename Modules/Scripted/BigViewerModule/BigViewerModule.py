@@ -83,12 +83,8 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
   def __init__(self, parent = None):
     ScriptedLoadableModuleWidget.__init__(self, parent) # must have this. otherwise get error when loading this module
 
-
-    print("+++++++++++++++++++++++++++++  BigViewerModuleWidget", flush = True)
-
-    self.kerasModelSegmentNuclei = keras.models.load_model("/home/gaoyi/usr/work/project/forSlicerScope/SlicerScope/Modules/ServerSide/unet_nucleus_20200120_at20200126.hdf5")
-
-    self.kerasModelSegmentColonGland = keras.models.load_model("/home/gaoyi/usr/work/project/forSlicerScope/SlicerScope/Modules/ServerSide/unet_glas_20200713.hdf5")
+    self.kerasModelSegmentNuclei = keras.models.load_model("/tmp/unet_nucleus_20200120_at20200126.hdf5")
+    self.kerasModelSegmentColonGland = keras.models.load_model("/tmp/unet_glas_20200713.hdf5")
 
 
 
@@ -120,8 +116,6 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     self.H5FilePathname = ""
     self.h5FileLoaded = False
 
-    print("I'm in 11111111111111111111111111111111111111111")
-
 
     # Interator
     layoutManager = slicer.app.layoutManager()
@@ -147,7 +141,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     redView = redWidget.sliceView()
     style = redView.interactorStyle()
     interactor = style.GetInteractor()
-    print(interactor.GetEventPosition())
+    #print(interactor.GetEventPosition())
     # Do something here
 
 
@@ -162,7 +156,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     interactor = style.GetInteractor()
 
     self.leftMouseButtonPos = interactor.GetEventPosition()
-    print(self.leftMouseButtonPos, type(self.leftMouseButtonPos), type(self.leftMouseButtonPos[0]))
+    #print(self.leftMouseButtonPos, type(self.leftMouseButtonPos), type(self.leftMouseButtonPos[0]))
     # Do something here
 
 
@@ -174,7 +168,7 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     redView = redWidget.sliceView()
     style = redView.interactorStyle()
     interactor = style.GetInteractor()
-    print(interactor.GetEventPosition())
+    #print(interactor.GetEventPosition())
 
     newPos = interactor.GetEventPosition()
 
@@ -215,8 +209,6 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
       #self.ObjectiveMagnificationSlicerWidget.valueChanged(self.ObjectiveMagnificationSlicerWidget.value)
 
   def setup(self):
-
-    print("I'm in 2222222222222222222222222222222")
 
     # In this function, we instantiate and connect widgets ...
     ScriptedLoadableModuleWidget.setup(self)
@@ -384,14 +376,6 @@ class BigViewerModuleWidget(ScriptedLoadableModuleWidget):
     self.detectGlandButton.connect('clicked(bool)', self.onDetectGlandButton)
     # connections
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-
-
-    print("I'm in 3333333333333333333333333333333333333333333333333333")
-
 
 
 
@@ -1168,8 +1152,6 @@ class BigViewerModuleLogic(ScriptedLoadableModuleLogic):
     sz = imageArray.shape
     numChannel = 3 # for RGB
 
-    print("+++++++++++++++++++", sz)
-
     #assert(sz[0] >= patchSideLen and sz[1] >= patchSideLen and sz[2] == 3),"Image shape must be >= " + str(patchSideLen) + "-cubed."
     if sz[2] != numChannel:
         print("Only process RGB image")
@@ -1179,8 +1161,6 @@ class BigViewerModuleLogic(ScriptedLoadableModuleLogic):
     # sampled numPatchSampleFactor times. Default is 10
     numPatchSample = math.ceil((sz[0]/patchSideLen)*(sz[1]/patchSideLen)*numPatchSampleFactor)
 
-
-    print("numPatchSample = ", numPatchSample)
 
     # this saves the segmentation result
     segArray = numpy.zeros((sz[0], sz[1], num_segmetnation_classes), dtype=numpy.float32)
@@ -1244,7 +1224,6 @@ class BigViewerModuleLogic(ScriptedLoadableModuleLogic):
     imgArray = imgArray[0, :, :, :]
 
     testImgSeg = self.segment2DRGBImageRandomSampleDividePrior(model = kerasModel, imageArray = imgArray.astype(numpy.float), patchSideLen = 64, numPatchSampleFactor = 5, batch_size = 10)
-    print(testImgSeg.max(), flush = True)
 
     testImgSeg = testImgSeg[numpy.newaxis, :, :]
 
@@ -1299,7 +1278,6 @@ class BigViewerModuleLogic(ScriptedLoadableModuleLogic):
     imgArray = imgArray[0, :, :, :]
 
     testImgSeg = self.segment2DRGBImageRandomSampleDividePrior(model = kerasModel, imageArray = imgArray.astype(numpy.float), patchSideLen = 64, numPatchSampleFactor = 5, batch_size = 10)
-    print(testImgSeg.max(), flush = True)
 
     testImgSeg = testImgSeg[numpy.newaxis, :, :]
 
