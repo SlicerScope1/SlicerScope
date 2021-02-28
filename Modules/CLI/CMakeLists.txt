@@ -7,6 +7,7 @@ set(cli_modules
   AddScalarVolumes
   CastScalarVolume
   CheckerBoardFilter
+  ColorDecomposition
   CurvatureAnisotropicDiffusion
   ExecutionModelTour
   ExtractSkeleton
